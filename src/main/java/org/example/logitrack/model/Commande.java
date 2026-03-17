@@ -16,14 +16,13 @@ public class Commande {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private LocalDate dateCommande;
-    @Enumerated(EnumType.STRING)
-    private StatutCommande statut;
+    private String StatutCommande;
 
     @ManyToOne
     @JoinColumn(name = "client_id")
     private Client client;
 
-    @OneToMany(mappedBy ="Commande")
+    @OneToMany(mappedBy = "commande")
     private List<LigneCommande> ligneCommandes;
 
 }
