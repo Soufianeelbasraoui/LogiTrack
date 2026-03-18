@@ -18,7 +18,7 @@ public class Client {
     private String email;
     private String telephone;
     private String ville;
-    @OneToMany(mappedBy = "client")
+    @OneToMany(mappedBy = "client",cascade = CascadeType.ALL)
     private List<Commande> commandes;
 
     public Client() {

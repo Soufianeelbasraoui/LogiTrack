@@ -16,13 +16,13 @@ public class Commande {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private LocalDate dateCommande;
-    private String StatutCommande;
+    private String Statut;
 
     @ManyToOne
     @JoinColumn(name = "client_id")
     private Client client;
 
-    @OneToMany(mappedBy = "commande")
+    @OneToMany(mappedBy = "commande",cascade = CascadeType.ALL)
     private List<LigneCommande> ligneCommandes;
 
 }
