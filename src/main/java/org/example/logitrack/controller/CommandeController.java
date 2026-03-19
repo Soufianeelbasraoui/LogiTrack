@@ -1,8 +1,10 @@
 package org.example.logitrack.controller;
 
 import org.example.logitrack.model.Commande;
+
 import org.example.logitrack.service.CommandeService;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,9 +34,11 @@ public class CommandeController {
     public void deleteCommande(@PathVariable int id){
        commandeService.deleteCommande(id);
    }
+
     @PutMapping("/{id}/status")
-    public Commande updateStatus(@PathVariable Integer id, @RequestBody Map<String, String> request) {
-        String statut = request.get("statut");
+    public Commande updateStatus(@PathVariable int id, @RequestBody String statut) {
         return commandeService.updateStatus(id, statut);
     }
-}
+
+    }
+

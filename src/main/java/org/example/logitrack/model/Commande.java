@@ -1,5 +1,6 @@
 package org.example.logitrack.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +17,7 @@ public class Commande {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private LocalDate dateCommande;
-    private String Statut;
+    private String statut;
 
     @ManyToOne
     @JoinColumn(name = "client_id")

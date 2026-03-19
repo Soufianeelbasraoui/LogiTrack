@@ -1,7 +1,11 @@
 package org.example.logitrack.service;
 
 import org.example.logitrack.model.Commande;
+import org.example.logitrack.model.LigneCommande;
+import org.example.logitrack.model.Produit;
 import org.example.logitrack.repository.CommandeRepository;
+import org.example.logitrack.repository.LigneCommandeRepository;
+import org.example.logitrack.repository.ProduitRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +15,8 @@ import java.util.List;
 public class CommandeService {
     @Autowired
     private CommandeRepository commandeRepository;
+    @Autowired
+    private LigneCommandeRepository ligneCommandeRepository;
 
     public List<Commande> findAllCommande(){
         return commandeRepository.findAll();
@@ -28,10 +34,9 @@ public class CommandeService {
 
     public Commande updateStatus(Integer id, String statut) {
         Commande commande = findCommandeById(id);
-        if (commande != null) {
             commande.setStatut(statut);
             return commandeRepository.save(commande);
-        }
-        return null;
+
     }
+
 }

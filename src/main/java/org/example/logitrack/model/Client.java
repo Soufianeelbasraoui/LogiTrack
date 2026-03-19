@@ -1,5 +1,6 @@
 package org.example.logitrack.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,6 +20,7 @@ public class Client {
     private String telephone;
     private String ville;
     @OneToMany(mappedBy = "client",cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Commande> commandes;
 
     public Client() {
