@@ -1,29 +1,32 @@
 package org.example.logitrack.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.example.logitrack.enums.StatutCommande;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Getter
-@Setter
 @Table(name = "Commande")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Commande {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private LocalDate dateCommande;
-    private String statut;
+
+    @Enumerated(EnumType.STRING)
+    private StatutCommande statut;
 
     @ManyToOne
     @JoinColumn(name = "client_id")
     private Client client;
 
-    @OneToMany(mappedBy = "commande",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "commande", cascade = CascadeType.ALL)
     private List<LigneCommande> ligneCommandes;
-
 }

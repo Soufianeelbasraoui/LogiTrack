@@ -1,16 +1,17 @@
 package org.example.logitrack.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Entity
-@Getter
-@Setter
 @Table(name = "Produit")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Produit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,9 +20,7 @@ public class Produit {
     private String categorie;
     private double prix;
     private int quantiteStock;
-    @OneToMany(mappedBy = "produit",cascade = CascadeType.ALL)
-    private List<LigneCommande> ligneCommandes;
 
-    public Produit() {
-    }
+    @OneToMany(mappedBy = "produit", cascade = CascadeType.ALL)
+    private List<LigneCommande> ligneCommandes;
 }
