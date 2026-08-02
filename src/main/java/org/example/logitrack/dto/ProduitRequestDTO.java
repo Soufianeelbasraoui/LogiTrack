@@ -14,14 +14,11 @@ import lombok.NoArgsConstructor;
 public class ProduitRequestDTO {
     @NotBlank
     private String nom;
-
     @NotBlank
     private String categorie;
-
     @NotNull
     @Positive
     private Double prix;
-
     @NotNull
     @Min(0)
     private Integer quantiteStock;
