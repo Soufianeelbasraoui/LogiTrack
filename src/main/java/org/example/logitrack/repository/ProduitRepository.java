@@ -17,6 +17,6 @@ public interface ProduitRepository extends JpaRepository<Produit, Long> {
 
     Page<Produit> findByPrixLessThan(Double prix, Pageable pageable);
 
-    @Query("SELECT p FROM Produit p WHERE p.quantiteStock < :seuil")
-    Page<Produit> findLowStock(@Param("seuil") int seuil, Pageable pageable);
+    @Query("SELECT p FROM Produit p WHERE p.quantiteStock < 10")
+    Page<Produit> findLowStock(Pageable pageable);
 }

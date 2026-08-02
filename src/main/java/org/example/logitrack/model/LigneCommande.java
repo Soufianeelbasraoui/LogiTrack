@@ -6,14 +6,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "LigneCommande")
+@Table(name = "ligne_commandes")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class LigneCommande {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     private int quantite;
 
     @ManyToOne

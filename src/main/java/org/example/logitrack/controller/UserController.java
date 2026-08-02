@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -19,11 +20,13 @@ public class UserController {
     @Autowired
     private UserService userService;
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Users> addUser(@RequestBody Users user) {
         Users savedUser = userService.addUser(user);
         return ResponseEntity.ok(savedUser);
     }
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<Users>> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -41,6 +44,7 @@ public class UserController {
         return ResponseEntity.ok(userService.searchUsers(keyword, pageable));
     }
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Users> getUserById(@PathVariable Long id) {
         Optional<Users> user = userService.getUserById(id);
         return user.map(ResponseEntity::ok)
@@ -48,6 +52,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Users> updateUser(@PathVariable Long id, @RequestBody Users userDetails) {
         Users updatedUser = userService.updateUser(id, userDetails);
         if (updatedUser != null) {
@@ -57,12 +62,14 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/count")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Long> countUsers() {
         return ResponseEntity.ok(userService.countAllUsers());
     }

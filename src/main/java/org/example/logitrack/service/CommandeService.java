@@ -3,22 +3,25 @@ package org.example.logitrack.service;
 import lombok.RequiredArgsConstructor;
 import org.example.logitrack.dto.CommandeRequestDTO;
 import org.example.logitrack.dto.CommandeResponseDTO;
+import org.example.logitrack.dto.LigneCommandeRequestDTO;
+import org.example.logitrack.dto.LigneCommandeResponseDTO;
 import org.example.logitrack.enums.StatutCommande;
 import org.example.logitrack.exception.ResourceNotFoundException;
 import org.example.logitrack.mapper.CommandeMapper;
 import org.example.logitrack.model.Client;
 import org.example.logitrack.model.Commande;
 
+import org.example.logitrack.model.LigneCommande;
+import org.example.logitrack.model.Produit;
 import org.example.logitrack.repository.ClientRepository;
 import org.example.logitrack.repository.CommandeRepository;
+import org.example.logitrack.repository.LigneCommandeRepository;
+import org.example.logitrack.repository.ProduitRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 public class CommandeService {
@@ -26,12 +29,8 @@ public class CommandeService {
     private final CommandeRepository commandeRepository;
     private final ClientRepository clientRepository;
     private final CommandeMapper commandeMapper;
-
-    public List<CommandeResponseDTO> findAllCommande() {
-        return commandeRepository.findAll().stream()
-                .map(commandeMapper::toDto)
-                .collect(Collectors.toList());
-    }
+    private final LigneCommandeRepository ligneCommandeRepository;
+    private final ProduitRepository produitRepository;
 
     public Page<CommandeResponseDTO> findAll(Pageable pageable) {
         return commandeRepository.findAll(pageable)
@@ -91,5 +90,27 @@ public class CommandeService {
     public Page<CommandeResponseDTO> findByClientId(Long clientId, Pageable pageable) {
         return commandeRepository.findByClientId(clientId, pageable)
                 .map(commandeMapper::toDto);
+    }
+    public long countCommandes() {
+        return commandeRepository.count();
+    }
+    public LigneCommandeResponseDTO addProductToOrder(Long orderId, LigneCommandeRequestDTO dto) {
+
+        Commande commande = commandeRepository.findById(orderId).orElseThrow(() -> new ResourceNotFoundException("Commande", orderId));
+
+        Produit produit = produitRepository.findById(dto.getProduitId()).orElseThrow(() -> new ResourceNotFoundException("Produit", dto.getProduitId()));
+
+        LigneCommande ligneCommande = new LigneCommande();
+        ligneCommande.setCommande(commande);
+        ligneCommande.setProduit(produit);
+        ligneCommande.setQuantite(dto.getQuantite());
+        LigneCommande saved = ligneCommandeRepository.save(ligneCommande);
+        LigneCommandeResponseDTO response = new LigneCommandeResponseDTO();
+        response.setId(saved.getId());
+        response.setProduitId(saved.getProduit().getId());
+        response.setCommandeId(saved.getCommande().getId());
+        response.setQuantite(saved.getQuantite());
+
+        return response;
     }
 }

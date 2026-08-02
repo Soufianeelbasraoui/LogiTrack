@@ -21,12 +21,6 @@ public class ClientService {
     private final ClientRepository clientRepository;
     private final ClientMapper clientMapper;
 
-    public List<ClientResponseDTO> findAllClients() {
-        return clientRepository.findAll().stream()
-                .map(clientMapper::toDto)
-                .collect(Collectors.toList());
-    }
-
     public Page<ClientResponseDTO> findAll(Pageable pageable) {
         return clientRepository.findAll(pageable)
                 .map(clientMapper::toDto);
@@ -60,5 +54,8 @@ public class ClientService {
     public Page<ClientResponseDTO> findByNom(String nom, Pageable pageable) {
         return clientRepository.findByNomContainingIgnoreCase(nom, pageable)
                 .map(clientMapper::toDto);
+    }
+    public long countClients() {
+        return clientRepository.count();
     }
 }

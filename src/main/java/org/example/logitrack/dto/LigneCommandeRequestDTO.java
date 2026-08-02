@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 public class LigneCommandeRequestDTO {
     @NotNull
     private Long produitId;
-
     @NotNull
     @Min(1)
     private Integer quantite;

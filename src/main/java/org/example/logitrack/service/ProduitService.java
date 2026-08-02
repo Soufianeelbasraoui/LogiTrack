@@ -66,4 +66,11 @@ public class ProduitService {
         return produitRepository.findByPrixLessThan(prix, pageable)
                 .map(produitMapper::toDto);
     }
+    public long countProducts() {
+        return produitRepository.count();
+    }
+    public Page<ProduitResponseDTO> findLowStock(Pageable pageable) {
+        return produitRepository.findLowStock(pageable)
+                .map(produitMapper::toDto);
+    }
 }
