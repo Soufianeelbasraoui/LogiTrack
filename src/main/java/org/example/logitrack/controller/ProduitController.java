@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/products")
 @RequiredArgsConstructor
@@ -61,29 +63,26 @@ public class ProduitController {
         produitService.deletProduit(id);
         return ResponseEntity.noContent().build();
     }
-
-    @GetMapping("/search")
+    @GetMapping("/search/categorie")
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
-    public ResponseEntity<Page<ProduitResponseDTO>> searchProduit(
-            @RequestParam(required = false) String categorie,
-            @RequestParam(required = false) Double prix,
+    public ResponseEntity<Page<ProduitResponseDTO>> searchByeatégorie(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "asc") String direction) {
-        Sort sort = direction.equalsIgnoreCase("desc")
-                ? Sort.by(sortBy).descending()
-                : Sort.by(sortBy).ascending();
-        Pageable pageable = PageRequest.of(page, size, sort);
-        if (categorie != null) {
-            return ResponseEntity.ok(produitService.findByCategorie(categorie, pageable));
-        }
-        if (prix != null) {
-            return ResponseEntity.ok(produitService.findByPrixLessThan(prix, pageable));
-        }
-        return ResponseEntity.ok(produitService.findAll(pageable));
+            @RequestParam String categorie
+    ){
+        Pageable pageable=PageRequest.of(page,size);
+       return ResponseEntity.ok(produitService.findByCategorie(categorie,pageable));
     }
-
+    @GetMapping("/search/prix")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    public ResponseEntity<Page<ProduitResponseDTO>> searchByName(
+            @RequestParam Double prix,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        Pageable pageable=PageRequest.of(page,size);
+        return ResponseEntity.ok(produitService.findByPrix(prix,pageable));
+    }
     @GetMapping("/count")
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public ResponseEntity<Long> countProducts() {
@@ -94,5 +93,10 @@ public class ProduitController {
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public ResponseEntity<Page<ProduitResponseDTO>> findLowStock(Pageable pageable) {
         return ResponseEntity.ok(produitService.findLowStock(pageable));
+    }
+    @GetMapping("/categories")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    public ResponseEntity<List<String>> getCategories() {
+        return ResponseEntity.ok(produitService.getCategories());
     }
 }

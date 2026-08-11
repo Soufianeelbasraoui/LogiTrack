@@ -1,11 +1,13 @@
 package org.example.logitrack.service;
 
+import org.example.logitrack.exception.ResourceNotFoundException;
 import org.example.logitrack.model.Users;
 import org.example.logitrack.repository.UserRepository;
 import org.example.logitrack.enums.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -15,10 +17,13 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     public Users addUser(Users user) {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new RuntimeException("Email déjà utilisé.");
         }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
     public Page<Users> getAllUsers(Pageable pageable) {
@@ -26,9 +31,6 @@ public class UserService {
     }
     public Page<Users> searchUsers(String keyword, Pageable pageable) {
         return userRepository.searchUsers(keyword, pageable);
-    }
-    public Page<Users> filterByRole(Role role, Pageable pageable) {
-        return userRepository.findByRole(role, pageable);
     }
     public Optional<Users> getUserById(Long id) {
         return userRepository.findById(id);
@@ -45,7 +47,7 @@ public class UserService {
                 existingUser.setPassword(userDetails.getPassword());
             }
             if (userDetails.getRole() != null) existingUser.setRole(userDetails.getRole());
-            
+
             return userRepository.save(existingUser);
         }
         return null;
@@ -62,4 +64,6 @@ public class UserService {
     public long countUsersByRole(Role role) {
         return userRepository.countByRole(role);
     }
+
+
 }

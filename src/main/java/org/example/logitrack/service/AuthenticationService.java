@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.example.logitrack.dto.AuthRequest;
 import org.example.logitrack.dto.AuthResponse;
 import org.example.logitrack.dto.RegisterRequest;
-import org.example.logitrack.enums.Role;
 import org.example.logitrack.model.Users;
 import org.example.logitrack.repository.UserRepository;
 import org.example.logitrack.security.JwtUtil;
@@ -16,6 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
@@ -31,24 +31,26 @@ public class AuthenticationService {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(request.getRole());
-//        if (request.getRole() == null) {
-//            user.setRole(Role.AGENT);
-//        } else {
-//            user.setRole(request.getRole());
-//        }
         userRepository.save(user);
-        String token = jwtUtil.generateToken(user.getEmail());
-
-        return new AuthResponse(token,user.getNom(),  user.getRole().name());
+        String token = jwtUtil.generateToken(
+                user.getEmail(),
+                user.getNom(),
+                user.getRole().name()
+        );
+        return new AuthResponse(token);
     }
     public AuthResponse login(AuthRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(  request.getEmail(),request.getPassword())
+        authenticationManager.authenticate( new UsernamePasswordAuthenticationToken(
+                request.getEmail(),
+                request.getPassword()
+                )
         );
-
-        Users user = userRepository.findByEmail(request.getEmail()) .orElseThrow(() -> new RuntimeException("User not found"));
-        String token = jwtUtil.generateToken(user.getEmail());
-
-        return new AuthResponse( token, user.getNom(), user.getRole().name());
+        Users user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
+        String token = jwtUtil.generateToken(
+                user.getEmail(),
+                user.getNom(),
+                user.getRole().name()
+        );
+        return new AuthResponse(token);
     }
 }

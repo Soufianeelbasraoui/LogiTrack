@@ -12,7 +12,6 @@ public interface UserRepository extends JpaRepository<Users, Long> {
 
     Optional<Users> findByEmail(String email);
     Boolean existsByEmail(String email);
-    Boolean existsByNom(String nom);
     long countByRole(Role role);
     Page<Users> findByRole(Role role, Pageable pageable);
     @Query("""

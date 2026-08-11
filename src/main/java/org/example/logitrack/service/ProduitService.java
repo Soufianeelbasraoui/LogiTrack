@@ -21,11 +21,6 @@ public class ProduitService {
     private final ProduitRepository produitRepository;
     private final ProduitMapper produitMapper;
 
-    public List<ProduitResponseDTO> getAllProduct() {
-        return produitRepository.findAll().stream()
-                .map(produitMapper::toDto)
-                .collect(Collectors.toList());
-    }
 
     public Page<ProduitResponseDTO> findAll(Pageable pageable) {
         return produitRepository.findAll(pageable)
@@ -44,8 +39,7 @@ public class ProduitService {
     }
 
     public ProduitResponseDTO update(Long id, ProduitRequestDTO dto) {
-        Produit produit = produitRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Produit", id));
+        Produit produit = produitRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Produit", id));
         produitMapper.updateEntityFromDto(dto, produit);
         return produitMapper.toDto(produitRepository.save(produit));
     }
@@ -58,19 +52,21 @@ public class ProduitService {
     }
 
     public Page<ProduitResponseDTO> findByCategorie(String categorie, Pageable pageable) {
-        return produitRepository.findByCategorie(categorie, pageable)
-                .map(produitMapper::toDto);
+        return produitRepository.findByCategorieContainingIgnoreCase(categorie, pageable).map( produitMapper::toDto);
     }
-
+   public Page<ProduitResponseDTO> findByPrix(Double prix,Pageable pageable){
+        return produitRepository.findProduitByPrix(prix,pageable).map(produitMapper::toDto);
+   }
     public Page<ProduitResponseDTO> findByPrixLessThan(Double prix, Pageable pageable) {
-        return produitRepository.findByPrixLessThan(prix, pageable)
-                .map(produitMapper::toDto);
+        return produitRepository.findByPrixLessThan(prix, pageable).map(produitMapper::toDto);
     }
     public long countProducts() {
         return produitRepository.count();
     }
     public Page<ProduitResponseDTO> findLowStock(Pageable pageable) {
-        return produitRepository.findLowStock(pageable)
-                .map(produitMapper::toDto);
+        return produitRepository.findByQuantiteStockLessThanEqual(10, pageable).map(produitMapper::toDto);
+    }
+    public List<String> getCategories() {
+        return produitRepository.findDistinctCategories();
     }
 }

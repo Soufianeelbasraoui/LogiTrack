@@ -1,5 +1,6 @@
 package org.example.logitrack.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,5 +23,6 @@ public class Produit {
     private int quantiteStock;
 
     @OneToMany(mappedBy = "produit", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<LigneCommande> ligneCommandes;
 }

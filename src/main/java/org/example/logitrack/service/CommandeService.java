@@ -1,10 +1,7 @@
 package org.example.logitrack.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.logitrack.dto.CommandeRequestDTO;
-import org.example.logitrack.dto.CommandeResponseDTO;
-import org.example.logitrack.dto.LigneCommandeRequestDTO;
-import org.example.logitrack.dto.LigneCommandeResponseDTO;
+import org.example.logitrack.dto.*;
 import org.example.logitrack.enums.StatutCommande;
 import org.example.logitrack.exception.ResourceNotFoundException;
 import org.example.logitrack.mapper.CommandeMapper;
@@ -18,10 +15,13 @@ import org.example.logitrack.repository.CommandeRepository;
 import org.example.logitrack.repository.LigneCommandeRepository;
 import org.example.logitrack.repository.ProduitRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class CommandeService {
@@ -76,28 +76,26 @@ public class CommandeService {
     }
 
     public CommandeResponseDTO updateStatus(Long id, StatutCommande statut) {
-        Commande commande = commandeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Commande", id));
+        Commande commande = commandeRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Commande", id));
         commande.setStatut(statut);
+
         return commandeMapper.toDto(commandeRepository.save(commande));
     }
 
     public Page<CommandeResponseDTO> findByStatut(StatutCommande statut, Pageable pageable) {
-        return commandeRepository.findByStatut(statut, pageable)
-                .map(commandeMapper::toDto);
+        return commandeRepository.findByStatut(statut, pageable).map(commandeMapper::toDto);
     }
 
-    public Page<CommandeResponseDTO> findByClientId(Long clientId, Pageable pageable) {
-        return commandeRepository.findByClientId(clientId, pageable)
-                .map(commandeMapper::toDto);
+    public Page<CommandeResponseDTO> searchByClientName( String nom, Pageable pageable) {
+        return commandeRepository.findByClientNomContainingIgnoreCase(nom, pageable).map(commandeMapper::toDto);
     }
+
     public long countCommandes() {
         return commandeRepository.count();
     }
+
     public LigneCommandeResponseDTO addProductToOrder(Long orderId, LigneCommandeRequestDTO dto) {
-
         Commande commande = commandeRepository.findById(orderId).orElseThrow(() -> new ResourceNotFoundException("Commande", orderId));
-
         Produit produit = produitRepository.findById(dto.getProduitId()).orElseThrow(() -> new ResourceNotFoundException("Produit", dto.getProduitId()));
 
         LigneCommande ligneCommande = new LigneCommande();
@@ -112,5 +110,18 @@ public class CommandeService {
         response.setQuantite(saved.getQuantite());
 
         return response;
+    }
+    public long countEnAttente(){
+        return commandeRepository.countEnAttente();
+    }
+
+    public Long countEXPEDIEE(){
+        return commandeRepository.countEXPEDIEE();
+    }
+    public Long countLIVREE(){
+        return commandeRepository.countLIVREE();
+    }
+    public List<Commande> getRecentCommandes() {
+        return commandeRepository.findRecentCommandes(PageRequest.of(0, 5));
     }
 }
