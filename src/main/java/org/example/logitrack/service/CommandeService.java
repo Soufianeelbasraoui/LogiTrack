@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -123,5 +124,12 @@ public class CommandeService {
     }
     public List<Commande> getRecentCommandes() {
         return commandeRepository.findRecentCommandes(PageRequest.of(0, 5));
+    }
+
+    public  List<Commande> CountCommentParDate(Long id){
+        Commande commande=commandeRepository.findById(id).orElseThrow(()->new RuntimeException("le command introvable"));
+        return commandeRepository.findCommandeByDateCommande(commande,id);
+
+
     }
 }

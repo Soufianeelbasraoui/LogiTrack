@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -132,5 +133,11 @@ public class CommandeController {
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public ResponseEntity<List<Commande>> getRecentCommandes() {
         return ResponseEntity.ok(commandeService.getRecentCommandes());
+    }
+
+    @PreAuthorize("hasRole('MANAGER')")
+    @GetMapping("/totalCommande")
+    public ResponseEntity<List<Commande>> CountCommentParDate(@PathVariable Long id,@RequestParam Date dateCommand){
+        return ResponseEntity.ok(commandeService.countCommandes(id,dateCommand));
     }
 }
