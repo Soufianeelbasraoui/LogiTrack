@@ -13,8 +13,6 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 public interface LigneCommandeMapper {
 
     @Mapping(target = "produitId", source = "produit.id")
-    @Mapping(target = "nomProduit", source = "produit.nom")
-    @Mapping(target = "prix", source = "produit.prix")
     LigneCommandeResponseDTO toDto(LigneCommande ligne);
 
     LigneCommande toEntity(LigneCommandeRequestDTO dto);

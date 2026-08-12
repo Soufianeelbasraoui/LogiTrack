@@ -17,8 +17,7 @@ public interface CommandeRepository extends JpaRepository<Commande, Long> {
 
     Page<Commande> findAll(Pageable pageable);
 
-    Page<Commande> findByClientId(Long clientId, Pageable pageable);
-
+    Page<Commande> findByClientNomContainingIgnoreCase( String nom,Pageable pageable);
     Page<Commande> findByStatut(StatutCommande statut, Pageable pageable);
 
     @Query("SELECT COUNT(c) FROM Commande c")
@@ -26,4 +25,15 @@ public interface CommandeRepository extends JpaRepository<Commande, Long> {
 
     @Query("SELECT l.produit FROM LigneCommande l GROUP BY l.produit ORDER BY COUNT(l) DESC")
     List<Produit> findTopProduit(Pageable pageable);
+
+    @Query("select count(c) from Commande c where c.statut='EN_ATTENTE'")
+    Long countEnAttente();
+
+    @Query("select count(c) from Commande c where c.statut='LIVREE'")
+    Long countLIVREE();
+
+    @Query("select count(c) from Commande c where c.statut='EXPEDIEE'")
+    Long countEXPEDIEE();
+    @Query("SELECT c FROM Commande c ORDER BY c.dateCommande DESC")
+    List<Commande> findRecentCommandes(Pageable pageable);
 }

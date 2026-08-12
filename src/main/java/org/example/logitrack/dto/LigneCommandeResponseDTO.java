@@ -10,7 +10,9 @@ import lombok.NoArgsConstructor;
 public class LigneCommandeResponseDTO {
     private Long id;
     private Long produitId;
-    private String nomProduit;
+    private Long commandeId;
     private Integer quantite;
-    private double prix;
+
+
+
 }

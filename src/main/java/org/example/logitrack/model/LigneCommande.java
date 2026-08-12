@@ -1,19 +1,21 @@
 package org.example.logitrack.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "LigneCommande")
+@Table(name = "ligne_commandes")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class LigneCommande {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @JsonIgnore
+    private Long id;
     private int quantite;
 
     @ManyToOne
