@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -36,4 +37,6 @@ public interface CommandeRepository extends JpaRepository<Commande, Long> {
     Long countEXPEDIEE();
     @Query("SELECT c FROM Commande c ORDER BY c.dateCommande DESC")
     List<Commande> findRecentCommandes(Pageable pageable);
+
+    Integer countCommandeByDateCommande(int total, Commande commande);
 }
