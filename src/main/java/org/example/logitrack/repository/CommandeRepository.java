@@ -38,5 +38,5 @@ public interface CommandeRepository extends JpaRepository<Commande, Long> {
     @Query("SELECT c FROM Commande c ORDER BY c.dateCommande DESC")
     List<Commande> findRecentCommandes(Pageable pageable);
 
-    List<Commande> findCommandeByDateCommande(Date dateCommand, Commande commande);
+    Integer countCommandeByDateCommande(int total, Commande commande);
 }
