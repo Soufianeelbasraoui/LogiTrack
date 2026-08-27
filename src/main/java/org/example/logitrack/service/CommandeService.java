@@ -126,8 +126,5 @@ public class CommandeService {
         return commandeRepository.findRecentCommandes(PageRequest.of(0, 5));
     }
 
-    public  Integer CountCommentParDate(int total,Long id){
-        Commande commande=commandeRepository.findById(id).orElseThrow(()->new RuntimeException("le command introvable"));
-        return commandeRepository.countCommandeByDateCommande(total,commande);
-    }
+
 }

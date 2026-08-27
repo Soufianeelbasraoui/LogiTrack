@@ -135,9 +135,5 @@ public class CommandeController {
         return ResponseEntity.ok(commandeService.getRecentCommandes());
     }
 
-    @PreAuthorize("hasRole('MANAGER')")
-    @GetMapping("/totalCommande")
-    public ResponseEntity<Integer> CountCommentParDate(@RequestParam int total,@PathVariable Long id){
-        return ResponseEntity.ok(commandeService.CountCommentParDate(total,id));
-    }
+
 }

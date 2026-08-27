@@ -25,14 +25,8 @@ public class ProduitController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN','AGENT','MANAGER')")
-    public ResponseEntity<Page<ProduitResponseDTO>> getAllProduit(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "asc") String direction) {
-        Sort sort = direction.equalsIgnoreCase("desc")
-                ? Sort.by(sortBy).descending()
-                : Sort.by(sortBy).ascending();
+    public ResponseEntity<Page<ProduitResponseDTO>> getAllProduit(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "id") String sortBy, @RequestParam(defaultValue = "asc") String direction) {
+        Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
         return ResponseEntity.ok(produitService.findAll(pageable));
     }
@@ -51,9 +45,7 @@ public class ProduitController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
-    public ResponseEntity<ProduitResponseDTO> updateProduit(
-            @PathVariable Long id,
-            @Valid @RequestBody ProduitRequestDTO dto) {
+    public ResponseEntity<ProduitResponseDTO> updateProduit(@PathVariable Long id, @Valid @RequestBody ProduitRequestDTO dto) {
         return ResponseEntity.ok(produitService.update(id, dto));
     }
 
@@ -65,21 +57,13 @@ public class ProduitController {
     }
     @GetMapping("/search/categorie")
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
-    public ResponseEntity<Page<ProduitResponseDTO>> searchByeatégorie(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam String categorie
-    ){
+    public ResponseEntity<Page<ProduitResponseDTO>> searchByeatégorie(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam String categorie){
         Pageable pageable=PageRequest.of(page,size);
        return ResponseEntity.ok(produitService.findByCategorie(categorie,pageable));
     }
     @GetMapping("/search/prix")
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
-    public ResponseEntity<Page<ProduitResponseDTO>> searchByName(
-            @RequestParam Double prix,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ){
+    public ResponseEntity<Page<ProduitResponseDTO>> searchByName(@RequestParam Double prix, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size){
         Pageable pageable=PageRequest.of(page,size);
         return ResponseEntity.ok(produitService.findByPrix(prix,pageable));
     }
