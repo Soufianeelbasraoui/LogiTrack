@@ -1,0 +1,39 @@
+# alert_rules.yml
+groups:
+  - name: logitrack_alerts
+    rules:
+      # API indisponible
+      - alert: APIDown
+        expr: up{job="logitrack"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "API LogiTrack est indisponible"
+
+      # Taux d'erreurs HTTP élevé
+      - alert: HighErrorRate
+        expr: rate(http_server_requests_seconds_count{status=~"5.."}[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Taux d'erreurs HTTP élevé"
+
+      # Temps de réponse élevé
+      - alert: HighResponseTime
+        expr: http_server_requests_seconds_max > 2
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Temps de réponse trop élevé"
+
+      # Mémoire élevée
+      - alert: HighMemoryUsage
+        expr: jvm_memory_used_bytes / jvm_memory_max_bytes > 0.85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Utilisation mémoire élevée"
