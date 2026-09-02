@@ -1,13 +1,14 @@
 package org.example.logitrack.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.example.logitrack.client.NotificationClient;
 import org.example.logitrack.dto.*;
 import org.example.logitrack.enums.StatutCommande;
 import org.example.logitrack.exception.ResourceNotFoundException;
 import org.example.logitrack.mapper.CommandeMapper;
 import org.example.logitrack.model.Client;
 import org.example.logitrack.model.Commande;
-
 import org.example.logitrack.model.LigneCommande;
 import org.example.logitrack.model.Produit;
 import org.example.logitrack.repository.ClientRepository;
@@ -20,11 +21,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CommandeService {
 
     private final CommandeRepository commandeRepository;
@@ -32,6 +33,7 @@ public class CommandeService {
     private final CommandeMapper commandeMapper;
     private final LigneCommandeRepository ligneCommandeRepository;
     private final ProduitRepository produitRepository;
+    private final NotificationClient notificationClient;
 
     public Page<CommandeResponseDTO> findAll(Pageable pageable) {
         return commandeRepository.findAll(pageable)
@@ -47,7 +49,20 @@ public class CommandeService {
         if (commande.getDateCommande() == null) {
             commande.setDateCommande(LocalDate.now());
         }
-        return commandeMapper.toDto(commandeRepository.save(commande));
+        Commande saved = commandeRepository.save(commande);
+
+        // ← زيد notification
+        try {
+            notificationClient.createNotification(new NotificationRequest(
+                    "Commande #" + saved.getId() + " créée avec succès",
+                    "ORDER_CREATED",
+                    saved.getId()
+            ));
+        } catch (Exception e) {
+            log.error("Notification Service indisponible: {}", e.getMessage());
+        }
+
+        return commandeMapper.toDto(saved);
     }
 
     public CommandeResponseDTO findCommandeById(Long id) {
@@ -76,19 +91,43 @@ public class CommandeService {
         commandeRepository.deleteById(id);
     }
 
+    // ─── تغيير statut → ORDER_SHIPPED / ORDER_DELIVERED ───
     public CommandeResponseDTO updateStatus(Long id, StatutCommande statut) {
-        Commande commande = commandeRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Commande", id));
+        Commande commande = commandeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Commande", id));
         commande.setStatut(statut);
+        Commande saved = commandeRepository.save(commande);
 
-        return commandeMapper.toDto(commandeRepository.save(commande));
+        // ← زيد notification حسب الstatut
+        String type = switch (statut) {
+            case EXPEDIEE -> "ORDER_SHIPPED";
+            case LIVREE   -> "ORDER_DELIVERED";
+            default       -> null;
+        };
+
+        if (type != null) {
+            try {
+                notificationClient.createNotification(new NotificationRequest(
+                        "Commande #" + id + " " + statut.getLibelle(),
+                        type,
+                        id
+                ));
+            } catch (Exception e) {
+                log.error("Notification Service indisponible: {}", e.getMessage());
+            }
+        }
+
+        return commandeMapper.toDto(saved);
     }
 
     public Page<CommandeResponseDTO> findByStatut(StatutCommande statut, Pageable pageable) {
-        return commandeRepository.findByStatut(statut, pageable).map(commandeMapper::toDto);
+        return commandeRepository.findByStatut(statut, pageable)
+                .map(commandeMapper::toDto);
     }
 
-    public Page<CommandeResponseDTO> searchByClientName( String nom, Pageable pageable) {
-        return commandeRepository.findByClientNomContainingIgnoreCase(nom, pageable).map(commandeMapper::toDto);
+    public Page<CommandeResponseDTO> searchByClientName(String nom, Pageable pageable) {
+        return commandeRepository.findByClientNomContainingIgnoreCase(nom, pageable)
+                .map(commandeMapper::toDto);
     }
 
     public long countCommandes() {
@@ -96,14 +135,17 @@ public class CommandeService {
     }
 
     public LigneCommandeResponseDTO addProductToOrder(Long orderId, LigneCommandeRequestDTO dto) {
-        Commande commande = commandeRepository.findById(orderId).orElseThrow(() -> new ResourceNotFoundException("Commande", orderId));
-        Produit produit = produitRepository.findById(dto.getProduitId()).orElseThrow(() -> new ResourceNotFoundException("Produit", dto.getProduitId()));
+        Commande commande = commandeRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Commande", orderId));
+        Produit produit = produitRepository.findById(dto.getProduitId())
+                .orElseThrow(() -> new ResourceNotFoundException("Produit", dto.getProduitId()));
 
         LigneCommande ligneCommande = new LigneCommande();
         ligneCommande.setCommande(commande);
         ligneCommande.setProduit(produit);
         ligneCommande.setQuantite(dto.getQuantite());
         LigneCommande saved = ligneCommandeRepository.save(ligneCommande);
+
         LigneCommandeResponseDTO response = new LigneCommandeResponseDTO();
         response.setId(saved.getId());
         response.setProduitId(saved.getProduit().getId());
@@ -112,19 +154,20 @@ public class CommandeService {
 
         return response;
     }
-    public long countEnAttente(){
+
+    public long countEnAttente() {
         return commandeRepository.countEnAttente();
     }
 
-    public Long countEXPEDIEE(){
+    public Long countEXPEDIEE() {
         return commandeRepository.countEXPEDIEE();
     }
-    public Long countLIVREE(){
+
+    public Long countLIVREE() {
         return commandeRepository.countLIVREE();
     }
+
     public List<Commande> getRecentCommandes() {
         return commandeRepository.findRecentCommandes(PageRequest.of(0, 5));
     }
-
-
 }
